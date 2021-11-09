@@ -22,6 +22,9 @@ Please make sure you have up-to-date NVIDIA drivers supporting CUDA 10.2 at leas
 
 Alternatively use `pip -r requirements.txt`.
 
+
+python train/train.py -n nvisii_google_3 -c conf/exp/srn.conf -D data_google_scenes/ --nviews 3 --resume
+
 # Getting the data
 
 - For the main ShapeNet experiments, we use the ShapeNet 64x64 dataset from NMR
