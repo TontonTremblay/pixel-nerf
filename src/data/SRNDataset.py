@@ -184,8 +184,8 @@ class SRNDataset(torch.utils.data.Dataset):
             self.z_near = 1.25
             self.z_far = 2.75
         else:
-            self.z_near = 0.3
-            self.z_far = 2.6 
+            self.z_near = 0
+            self.z_far = 3.1 
         self.lindisp = False
 
     def __len__(self):
@@ -194,8 +194,27 @@ class SRNDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         intrin_path = self.intrins[index]
         dir_path = os.path.dirname(intrin_path)
-        rgb_paths = sorted(glob.glob(os.path.join(dir_path, "rgb", "*")))
-        pose_paths = sorted(glob.glob(os.path.join(dir_path, "pose", "*")))
+        rgb_paths_tmp = sorted(glob.glob(os.path.join(dir_path, "rgb", "*")))
+        pose_paths_tmp = sorted(glob.glob(os.path.join(dir_path, "pose", "*")))
+
+        rgb_paths = []
+        pose_paths = []
+        for i_rgb_path in range(len(rgb_paths_tmp)):
+            rgb_path = rgb_paths_tmp[i_rgb_path]
+            img = imageio.imread(rgb_path)[..., :3]
+            mask = (img != 255).all(axis=-1)[..., None].astype(np.uint8) * 255
+            rows = np.any(mask, axis=1)
+            rnz = np.where(rows)[0]
+            if len(rnz) == 0:
+                continue
+            rgb_paths.append(rgb_path)
+            pose_paths.append(pose_paths_tmp[i_rgb_path])
+        missing = 150 - len(rgb_paths)
+
+        for m in range(missing):
+            i_rand = np.random.randint(0,150-1-missing)
+            rgb_paths.append(rgb_paths[i_rand])
+            pose_paths.append(pose_paths[i_rand])
 
         assert len(rgb_paths) == len(pose_paths)
 
@@ -212,7 +231,6 @@ class SRNDataset(torch.utils.data.Dataset):
         all_poses = []
         all_masks = []
         all_bboxes = []
-
 
         # vis = create_visualizer(clear=True)
         i = 0 
@@ -242,10 +260,10 @@ class SRNDataset(torch.utils.data.Dataset):
             cols = np.any(mask, axis=0)
             rnz = np.where(rows)[0]
             cnz = np.where(cols)[0]
-            if len(rnz) == 0:
-                raise RuntimeError(
-                    "ERROR: Bad image at", rgb_path, "please investigate!"
-                )
+            # if len(rnz) == 0:
+            #     raise RuntimeError(
+            #         "ERROR: Bad image at", rgb_path, "please investigate!"
+            #     )
             rmin, rmax = rnz[[0, -1]]
             cmin, cmax = cnz[[0, -1]]
             bbox = torch.tensor([cmin, rmin, cmax, rmax], dtype=torch.float32)
