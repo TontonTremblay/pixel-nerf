@@ -29,7 +29,7 @@ def extra_args(parser):
     parser.add_argument(
         "--split",
         type=str,
-        default="val",
+        default="test",
         help="Split of data to use train | val | test",
     )
 
@@ -61,6 +61,11 @@ net.load_weights(args)
 
 if args.coarse:
     net.mlp_fine = None
+
+args.dataset_format = "srn"
+
+# print()
+# raise()
 
 dset = get_split_dataset(
     args.dataset_format, args.datadir, want_split=args.split, training=False
