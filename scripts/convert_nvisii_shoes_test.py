@@ -157,7 +157,8 @@ for i_folder, folder_name in enumerate(folders_new):
   files_to_load.append(sorted(glob.glob(folder_name+"*.json"))[train_shoe_view[folder_name.split("/")[-2]]])
   files_to_load.append(sorted(glob.glob(folder_name+"*.json"))[train_shoe_view[folder_name.split("/")[-2]]])
   # print(folder_name.split("/")[-2],train_shoe_view[folder_name.split("/")[-2]],files_to_load[-1])
-
+  print(folder_name.split("/")[-2],i_folder)
+  continue
   for i_file, file_path in enumerate(files_to_load):
     if i_file < len(files_to_load)-2:
       continue

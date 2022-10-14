@@ -205,7 +205,8 @@ class PixelNeRFTrainer(trainlib.Trainer):
 
         rgb_loss = self.rgb_coarse_crit(coarse.rgb, all_rgb_gt)
         if rgb_loss.isnan().any().item()==True:
-          raise()
+            print(data['path'])
+            raise()
         loss_dict["rc"] = rgb_loss.item() * self.lambda_coarse
         if using_fine:
             fine_loss = self.rgb_fine_crit(fine.rgb, all_rgb_gt)

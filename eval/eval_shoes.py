@@ -138,9 +138,41 @@ if has_output:
 
 
 net = make_model(conf["model"]).to(device=device).load_weights(args)
+def get_n_params(model):
+    pp=0
+    for p in list(model.parameters()):
+        nn=1
+        for s in list(p.size()):
+            nn = nn*s
+        pp += nn
+    return pp
+print(get_n_params(net))
+
+model_parameters = filter(lambda p: p.requires_grad, net.parameters())
+params = sum([np.prod(p.size()) for p in model_parameters])
+print(params)
+
+from prettytable import PrettyTable
+
+def count_parameters(model):
+    table = PrettyTable(["Modules", "Parameters"])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad: 
+            continue
+        param = parameter.numel()
+        table.add_row([name, param])
+        total_params+=param
+    print(table)
+    print(f"Total Trainable Params: {total_params}")
+    return total_params
+# print(count_parameters(net))
+# raise()
 renderer = NeRFRenderer.from_conf(
     conf["renderer"], lindisp=dset.lindisp, eval_batch_size=args.ray_batch_size
 ).to(device=device)
+
+
 if args.coarse:
     net.mlp_fine = None
 
@@ -281,13 +313,17 @@ with torch.no_grad():
         )
 
         all_rgb, all_depth = [], []
+        import time
+        
+        time_old = time.time()
         for rays in tqdm.tqdm(rays_spl):
             rgb, depth = render_par(rays[None])
             rgb = rgb[0].cpu()
             depth = depth[0].cpu()
             all_rgb.append(rgb)
             all_depth.append(depth)
-
+        print(time.time() - time_old)
+        raise()
         all_rgb = torch.cat(all_rgb, dim=0)
         all_depth = torch.cat(all_depth, dim=0)
         all_depth = (all_depth - z_near) / (z_far - z_near)

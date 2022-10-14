@@ -10,6 +10,12 @@ import argparse
 import subprocess
 import cv2 
 
+
+
+
+
+# run with OPENCV_IO_ENABLE_OPENEXR=1 python ....
+
 parser = argparse.ArgumentParser(description="Compare group of runs.")
 
 parser.add_argument("--blenderdir", default="", help="guess folder")
@@ -49,13 +55,50 @@ scale = 1
 
 out = out_train
 folder_name_out = '_train'
-for i_folder, folder_name in enumerate(sorted(glob.glob(blenderdir+"*/"))):
-  if i_folder>=280 and i_folder<282:
-    folder_name_out = '_val'
+folders = sorted(glob.glob(blenderdir+"*/"))
 
-  elif i_folder>=282:
-    out = out_test
-    folder_name_out = '_test'
+folders_new = []
+
+folders_to_remove = [
+  "Womens_Suede_Bahama_in_Graphite_Suede_t22AJSRjBOX",
+  "Santa_Cruz_Mens_umxTczr1Ygg",
+  "Great_Jones_Wingtip_kAqSg6EgG0I",
+  "PureCadence_2_Color_HiRskRedNghtlfeSlvrBlckWht_Size_70",
+  "MARTIN_WEDGE_LACE_BOOT",
+  "Reebok_DMX_MAX_PLUS_RAINWALKER",
+  "Reef_Star_Cushion_Flipflops_Size_8_Black",
+  "JS_WINGS_20_BLACK_FLAG",
+  "TZX_Runner",
+  "Reebok_SH_PRIME_COURT_LOW",
+  "Reebok_SH_PRIME_COURT_MID",
+  "Timberland_Mens_Earthkeepers_Casco_Bay_Canvas_SlipOn",
+  "Chelsea_BlkHeelPMP_DwxLtZNxLZZ",
+  "ZX700_mzGbdP3u6JB",
+  "Tiek_Blue_Patent_Tieks_Italian_Leather_Ballet_Flats",
+  "F5_TRX_FG",
+]
+
+for folder in folders:
+  name = folder.split("/")[-2]
+  keep = True
+
+  for name_remove in folders_to_remove:
+    if name_remove == name:
+      keep = False
+      print(name_remove,name)
+  if keep:
+    folders_new.append(folder)
+
+# print(len(folders_new),len(folders),len(folders)-len(folders_new))
+# raise()
+
+for i_folder, folder_name in enumerate(folders_new):
+  # if i_folder>=280 and i_folder<282:
+  #   folder_name_out = '_val'
+
+  # elif i_folder>=282:
+  #   out = out_test
+  #   folder_name_out = '_test'
   path_out = f"{outdir}/{folder_name_out}/{str(i_folder).zfill(5)}/"
   # create folder
   subprocess.call(['mkdir',path_out])
@@ -63,16 +106,18 @@ for i_folder, folder_name in enumerate(sorted(glob.glob(blenderdir+"*/"))):
   subprocess.call(['mkdir',path_out+"/pose"])
 
   # add intrinsics
-  scale = 1600/n_down
-  fx = 1931.371337890625
+  # scale = 1600/n_down
+  scale = 800/n_down
+  # fx = 1931.371337890625
+  fx = 965.6856689453125
   s_output = f"{fx/scale} {n_down/2} {n_down/2}\n0 0 0 \n{n_down} {n_down}"
 
   with open(path_out+'intrinsics.txt','w+')as f:
     f.write(s_output)
   
 
-
-  for i_file, file_path in enumerate(sorted(glob.glob(folder_name+"*.json"))):
+  files_to_load = sorted(glob.glob(folder_name+"*.json"))[:60]
+  for i_file, file_path in enumerate(files_to_load):
 
     with open(file_path) as json_file:
         data = json.load(json_file)
