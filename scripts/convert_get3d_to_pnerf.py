@@ -154,11 +154,16 @@ def visualize_pointcloud(vis, name, pc, color=None, transform=None, **kwargs):
 parser = argparse.ArgumentParser(description="Compare group of runs.")
 
 parser.add_argument("--blenderdir", 
-  default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/renders/img/03001627/", 
+  # default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/renders/img/03001627/", 
+  # default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/renders/img/03001627/", 
+  # default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/renders_table/img/04379243/",
+  default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/renders_car/img/02958343/",
   help="guess folder"
 )
 parser.add_argument("--outdir", 
-  default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/pixelner/", 
+  # default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/pixelner/", 
+  # default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/pixelnerf_table/", 
+  default="/media/jtremblay/bf64b840-723c-4e19-9dbc-f6a092b66406/home/jtremblay/data/shapenet/pixelnerf_cars/", 
   help="gt folder")
 parser.add_argument("--size", default=128, help="gt folder")
 # parser.add_argument("--out", default="exp.csv", help="out_file")
